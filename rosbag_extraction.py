@@ -1,15 +1,19 @@
 import numpy as np
 from rosbags.highlevel import AnyReader
 import cv2
+import os
 from pathlib import Path
 
-bag_path = Path("./comp4_2025-05-20-16-33-03.bag")
+bag_path = Path("comp2_2025-05-17-10-57-10.bag")
+
+frames_dir = Path("./frames")
+frames_dir.mkdir(exist_ok=True)  # Create frames directory if it doesn't exist
 topic_name = '/d455_front/camera/color/image_rect_color'
 
 with AnyReader([bag_path]) as reader:
     connections = [c for c in reader.connections if c.topic == topic_name]
 
-    out = None
+    frame_count = 0  # Initialize frame counter
 
     for connection, timestamp, rawdata in reader.messages(connections=connections):
         msg = reader.deserialize(rawdata, connection.msgtype)
@@ -34,17 +38,13 @@ with AnyReader([bag_path]) as reader:
             # If mono, convert to BGR for VideoWriter
             if channels == 1:
                 frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
-
-        # Initialize video writer dynamically
-        if out is None:
-            height, width = frame.shape[:2]
-            out = cv2.VideoWriter('output.mp4',
-                                  cv2.VideoWriter_fourcc(*'mp4v'),
-                                  30,
-                                  (width, height))
-
-        out.write(frame)
+                
+        # Save the frame as a PNG file with sequential numbering
+        frame_path = frames_dir / f"frame_{frame_count:04d}.png"
+        cv2.imwrite(str(frame_path), frame)
+        frame_count += 1
 
     if out:
         out.release()
         print("✅ Saved video as output.mp4")
+    print(f"✅ Saved {frame_count} frames to {frames_dir}")
