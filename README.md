@@ -36,5 +36,9 @@ Error: The program is denied permission to open the file
 
 Solution: This is due to Windows locking the file when copying is not finished. Its suggested that you are connected through ethernet when copying from the NAS. 
 
+## Testing Links
+https://colab.research.google.com/drive/124SJ4nv-rbUG5dK9VCmKPHLiADfUyLp2#scrollTo=eetFufgbaOiC 
+
+
 ## Contributors
 Samarth Das
